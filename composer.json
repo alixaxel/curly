@@ -1,0 +1,22 @@
+{
+    "name": "alixaxel/curly",
+    "description": "Parallel cURL Wrapper for PHP",
+    "keywords": ["curl", "curl_multi"],
+    "homepage": "https://github.com/alixaxel/curly/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Alix Axel",
+            "email": "alix.axel@gmail.com"
+        }
+    ],
+    "autoload": {
+		"psr-0": {
+			"alixaxel\\curly": "src/"
+		}
+	},
+    "require": {
+        "php": ">=5.4.0",
+        "lib-curl": "*"
+    }
+}
