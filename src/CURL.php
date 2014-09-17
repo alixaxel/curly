@@ -4,7 +4,7 @@
  * The MIT License
  * http://creativecommons.org/licenses/MIT/
  *
- * curly 0.2.0 (github.com/alixaxel/curly/)
+ * curly 0.2.1 (github.com/alixaxel/curly/)
  * Copyright (c) 2014 Alix Axel <alix.axel@gmail.com>
  */
 
@@ -21,6 +21,9 @@ class CURL
 	 * @param bool|string $cookie path to cookie, true for a temporary one
 	 * @param array $options additional cURL options to set for the request
 	 * @param int $attempts maximum number of retries (0 returns the cURL handle)
+	 * 
+	 * @throws \Exception if the cURL request fails
+	 * 
 	 * @return resource|string|false
 	 */
 	public static function Uni($url, $data = null, $method = 'GET', $cookie = null, $options = null, $attempts = 3)
@@ -116,6 +119,11 @@ class CURL
 
 				usleep(pow(2, $i - 2) * 1000000);
 			}
+			
+			if ($result === false)
+			{
+				throw new \Exception(curl_error($curl), curl_errno($curl));
+			}
 
 			curl_close($curl);
 		}
@@ -134,6 +142,9 @@ class CURL
 	 * @param null|callable $callback callback to call after each request is done
 	 * @param null|int $parallel maximum number of parallel requests
 	 * @param null|int $throttle wait at least $throttle seconds for every $parallel requests
+	 * 
+	 * @throws \Exception if any of the cURL requests fails
+	 * 
 	 * @return array|false
 	 */
 	public static function Multi($handles, $callback = null, $parallel = null, $throttle = null)
@@ -199,6 +210,11 @@ class CURL
 									$result[$key] = curl_multi_getcontent($handle);
 								}
 							}
+							
+							else
+							{
+								throw new \Exception(curl_error($handle), curl_errno($handle));
+							}
 
 							curl_multi_remove_handle($curl, $handle); curl_close($handle);
 						}
@@ -235,6 +251,7 @@ class CURL
 	 * @param null|string $xpath XPath expression to evaluate
 	 * @param null|string|array $key path to return
 	 * @param mixed $default default value in case of failure
+	 * 
 	 * @return mixed
 	 */
 	public static function Verse($html, $xpath = null, $key = null, $default = false)
@@ -293,6 +310,7 @@ class CURL
 	 * Translates CSS selectors into XPath expressions.
 	 *
 	 * @param string $selector CSS selector to translate
+	 * 
 	 * @return string XPath expression
 	 */
 	public static function XPathify($selector)

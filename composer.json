@@ -1,7 +1,7 @@
 {
 	"name": "alixaxel/curly",
 	"type": "library",
-	"version": "0.2.0",
+	"version": "0.2.1",
 	"description": "Parallel cURL Wrapper for PHP",
 	"keywords": ["curl", "curl_multi"],
 	"homepage": "https://github.com/alixaxel/curly/",

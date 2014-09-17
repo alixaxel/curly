@@ -15,7 +15,7 @@ class CURL_Test extends PHPUnit_Framework_TestCase
 	{
 		$handles = [];
 		
-		for ($i = 0; $i <= 16; ++$i)
+		for ($i = 0; $i <= 8; ++$i)
 		{
 			$handles[] = CURL::Uni(self::$url, null, 'GET', null, null, 0);
 		}

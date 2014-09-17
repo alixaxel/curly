@@ -39,6 +39,32 @@ $data = [
 var_dump(CURL::Uni($url, $data, 'POST'));
 ```
 
+##Usage (Multiple Requests)
+
+```php
+<?php
+
+use alixaxel\curly\CURL;
+
+$url = 'http://httpbin.org/post',
+$data = [
+	'foo' => sprintf('@', __FILE__),
+	'bar' => 'baz',
+];
+
+$handles = [];
+
+for ($i = 0; $i < 16; ++$i)
+{
+	$handles[$key = uniqid()] = CURL::Uni($url, $data, 'POST', null, null, 0);
+}
+
+$parallel = 4; // number of requests to make in parallel
+$throttle = 1; // wait at least 1 second per each $parallel requests
+
+print_r(CURL::Multi($handles, null, $parallel, $throttle)); // original keys are preserved
+```
+
 ##Usage (Multiple Requests with Callback)
 
 ```php
@@ -56,17 +82,17 @@ $handles = [];
 
 for ($i = 0; $i < 16; ++$i)
 {
-	$handles[$id = uniqid()] = CURL::Uni($url, $data, 'POST', null, null, 0);
+	$handles[$key = uniqid()] = CURL::Uni($url, $data, 'POST', null, null, 0);
 }
 
 $parallel = 4; // number of requests to make in parallel
 $throttle = 1; // wait at least 1 second per each $parallel requests
 
-$handles = CURL::Multi($handles, function ($response, $info, $id) {
+$result = CURL::Multi($handles, function ($response, $info, $id) {
 	var_dump($id, $response);
 }, $parallel, $throttle);
 
-print_r($handles);
+print_r($result); // each key will have the return value of the lambda callback 
 ```
 
 ##Changelog
@@ -76,7 +102,7 @@ print_r($handles);
 
 ##Credits
 
-XPathify() is based on [visionmedia/php-selector](https://github.com/visionmedia/php-selector/).
+`XPathify()` is based on [visionmedia/php-selector](https://github.com/visionmedia/php-selector/).
 
 ##License (MIT)
 
