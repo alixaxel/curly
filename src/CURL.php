@@ -4,7 +4,7 @@
 * The MIT License
 * http://creativecommons.org/licenses/MIT/
 *
-* curly 0.1.0 (github.com/alixaxel/curly/)
+* curly 0.2.0 (github.com/alixaxel/curly/)
 * Copyright (c) 2014 Alix Axel <alix.axel@gmail.com>
 **/
 
@@ -12,6 +12,17 @@ namespace alixaxel\curly;
 
 class CURL
 {
+    /**
+     * Create and optionally execute a single cURL request.
+     *
+     * @param string $url request URL
+     * @param array $data request payload
+     * @param string $method HTTP request method
+     * @param bool|string $cookie path to cookie, true for a temporary one
+     * @param array $options additional cURL options to set for the request
+     * @param int $attempts maximum number of retries (0 returns the cURL handle)
+     * @return resource|string|false
+     */
 	public static function Uni($url, $data = null, $method = 'GET', $cookie = null, $options = null, $attempts = 3)
 	{
 		$result = false;
@@ -112,6 +123,19 @@ class CURL
 		return $result;
 	}
 
+    /**
+     * Execute multiple cURL requests in parallel.
+     * 
+     * This method will return an array preserving the original indexes as identification keys.
+     * If $callback is set, it will be called as soon as each request completes, with the following arguments:
+     * 	$callback($body, $info, $key)
+     *
+     * @param array $handles array containing cURL handles
+     * @param null|callable $callback callback to call after each request is done
+     * @param null|int $parallel maximum number of parallel requests
+     * @param null|int $throttle wait at least $throttle seconds for every $parallel requests
+     * @return array|false
+     */
 	public static function Multi($handles, $callback = null, $parallel = null, $throttle = null)
 	{
 		if (is_array($handles) === true)
@@ -203,7 +227,16 @@ class CURL
 
 		return false;
 	}
-
+	
+    /**
+     * Parses HTML into a SimpleXML DOM structure, optionally using an XPath expression.
+     *
+     * @param string|\SimpleXMLElement $html string containing HTML
+     * @param null|string $xpath XPath expression to evaluate
+     * @param null|string|array $key path to return
+     * @param mixed $default default value in case of failure
+     * @return mixed
+     */
 	public static function Verse($html, $xpath = null, $key = null, $default = false)
 	{
 		if (is_string($html) === true)
@@ -254,5 +287,53 @@ class CURL
 		}
 
 		return $default;
+	}
+	
+    /**
+     * Translates CSS selectors into XPath expressions.
+     *
+     * @param string $selector CSS selector to translate
+     * @return string XPath expression
+     */
+	public static function XPathify($selector)
+	{
+		$regex = [
+			'~\s*[>]\s*~' => '>',
+			'~\s*[\~]\s*~' => '~',
+			'~\s*[+]\s*~' => '+',
+			'~\s*[,]\s*~' => ',',
+		];
+	
+		$selector = preg_split('~\s+~', preg_replace(array_keys($regex), $regex, $selector));
+	
+		foreach ($selector as $key => $value)
+		{
+			$regex = [
+				'~\s*[,]\s*~' => '|descendant-or-self::',
+				'~:(button|checkbox|color|date(?:time(?:-local)?)?|email|file|image|month|number|password|radio|range|reset|search|submit|tel|text|time|url|week)~' => 'input[@type="$1"]',
+				'~[[](\w+)[]]~' => '*[@$1]',
+				'~[[](\w+)=[\'"]?(.*?)[\'"]?[]]~' => '[@$1="$2"]',
+				'~^[[]~' => '*[',
+				'~([\w-]+)#([\w-]+)~' => '$1[@id="$2"]',
+				'~#([\w-]+)~' => '*[@id="$1"]',
+				'~([\w-]+)[.]([\w-]+)~' => '$1[contains(concat(" ", @class, " "), " $2 ")]',
+				'~[.]([\w-]+)~' => '*[contains(concat(" ", @class, " "), " $1 ")]',
+				'~([\w-]+):first-child~' => '*/$1[position() = 1]',
+				'~([\w-]+):last-child~' => '*/$1[position() = last()]',
+				'~:first-child~' => '*/*[position() = 1]',
+				'~:last-child~' => '*/*[position() = last()]',
+				'~:nth-last-child[(](\d+)[)]~' => '[position() = (last() - ($1 - 1))]',
+				'~([\w-]+):nth-child[(](\d+)[)]~' => '*/*[position() = $2 and self::$1]',
+				'~:nth-child[(](\d+)[)]~' => '*/*[position() = $1]',
+				'~([\w-]+):contains[(](.*?)[)]~' => '$1[contains(string(.), "$2")]',
+				'~\s*[>]\s*~' => '/',
+				'~\s*[\~]\s*~' => '/following-sibling::',
+				'~\s*[+]\s*([\w-]+)~' => '/following-sibling::$1[position() = 1]',
+			];
+	
+			$selector[$key] = str_replace([']*', ']/*'], ']', preg_replace(array_keys($regex), $regex, $value));
+		}
+	
+		return sprintf('descendant-or-self::%s', implode('/descendant::', $selector));
 	}
 }

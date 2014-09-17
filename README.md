@@ -11,6 +11,10 @@ Parallel cURL Wrapper for PHP
 
 - **0.1.0** ~~initial release~~
 
+##Credits
+
+XPathify() is based on [visionmedia/php-selector](https://github.com/visionmedia/php-selector/).
+
 ##License (MIT)
 
 Copyright (c) 2014 Alix Axel (alix.axel+github@gmail.com).
