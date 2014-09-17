@@ -21,7 +21,7 @@ Add the following dependency in your composer.json file:
 }
 ```
 
-And then just run `composer install` or `composer install`.
+And then just run `composer install` or `composer update`.
 
 ##Usage (Single Requests)
 
