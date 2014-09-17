@@ -10,6 +10,7 @@ Parallel cURL Wrapper for PHP
 ##Changelog
 
 - **0.1.0** ~~initial release~~
+- **0.2.0** ~~added XPathify() utility method~~
 
 ##Credits
 
