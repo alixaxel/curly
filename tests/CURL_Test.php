@@ -4,13 +4,22 @@ use alixaxel\curly\CURL;
 
 class CURL_Test extends PHPUnit_Framework_TestCase
 {
-	public function testUni()
+	private static $url = 'http://httpbin.org/delay/3';
+	
+	public function test_Uni()
 	{
-		$this->assertTrue(true);
+		$this->assertTrue(CURL::Uni(self::$url, null, 'GET', null, null, 3) !== false);
 	}
 	
-	public function testMulti()
+	public function test_Multi()
 	{
-		$this->assertTrue(true);
+		$handles = [];
+		
+		for ($i = 0; $i <= 16; ++$i)
+		{
+			$handles[] = Uni(self::$url, null, 'GET', null, null, 0);
+		}
+		
+		$this->assertTrue(in_array(false, CURL::Multi($handles, null, 4, null), true) === false);
 	}
 }
