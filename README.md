@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/alixaxel/curly.svg?branch=master)](https://travis-ci.org/alixaxel/curly/)
+
 #curly
 
 Parallel cURL Wrapper for PHP
